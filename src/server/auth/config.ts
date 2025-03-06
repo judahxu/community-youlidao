@@ -10,6 +10,7 @@ import {
   users,
   verificationTokens,
 } from "@/server/db/schema";
+import { Adapter } from "next-auth/adapters";
 
 /**
  * Module augmentation for `next-auth` types. Allows us to add custom properties to the `session`
@@ -22,14 +23,18 @@ declare module "next-auth" {
     user: {
       id: string;
       // ...other properties
-      // role: UserRole;
+      name: string;
+      role: string;
+      email: string;
+      status: string;
     } & DefaultSession["user"];
   }
 
-  // interface User {
-  //   // ...other properties
-  //   // role: UserRole;
-  // }
+  interface User {
+    // ...other properties
+    role: string;
+    status: string;
+  }
 }
 
 /**
@@ -47,7 +52,7 @@ export const authConfig = {
     accountsTable: accounts,
     sessionsTable: sessions,
     verificationTokensTable: verificationTokens,
-  }),
+  }) as Adapter,
   session: {
     strategy: "jwt",
     maxAge: 30 * 24 * 60 * 60, // 30 天
@@ -66,6 +71,8 @@ export const authConfig = {
         token.id = user.id;
         token.email = user.email;
         token.name = user.name;
+        token.role = user.role;
+        token.status = user.status;
       }
       return token;
     },
@@ -73,8 +80,10 @@ export const authConfig = {
     async session({ session, token }) {
       if (token && session.user) {
         session.user.id = token.id as string;
-        session.user.email = token.email;
-        session.user.name = token.name;
+        session.user.email = token.email!;
+        session.user.name = token.name!;
+        session.user.role = token.role as string;
+        session.user.status = token.status as string;
       }
       return session;
     },

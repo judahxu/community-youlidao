@@ -19,7 +19,7 @@ import {
 } from 'lucide-react';
 
 // 快速访问卡片组件
-const QuickAccessCard = ({ icon, title, description, color, badge }) => {
+const QuickAccessCard = ({ icon, title, description, color, badge }: { icon: React.ReactNode, title: string, description: string, color: string, badge?: string }) => {
   return (
     <Card className="group hover:shadow-md transition-all duration-300 border border-gray-200 dark:border-gray-800 overflow-hidden">
       <div className="absolute top-0 left-0 w-full h-1 bg-gray-200 dark:bg-gray-700">
@@ -46,7 +46,7 @@ const QuickAccessCard = ({ icon, title, description, color, badge }) => {
 };
 
 // 统计卡片组件
-const StatCard = ({ icon, value, label }) => {
+const StatCard = ({ icon, value, label }: { icon: React.ReactNode, value: string, label: string }) => {
   return (
     <Card>
       <CardContent className="p-6 text-center space-y-2">

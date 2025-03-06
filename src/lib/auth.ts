@@ -24,7 +24,7 @@ export async function getCurrentUser() {
  * 在服务器组件中使用，用于保护需要登录的页面
  * @param redirectTo 重定向地址，默认为 /login
  */
-export async function requireAuth(redirectTo: string = "/login") {
+export async function requireAuth(redirectTo = "/login") {
   const user = await getCurrentUser();
   
   if (!user) {
@@ -39,7 +39,7 @@ export async function requireAuth(redirectTo: string = "/login") {
  * 在服务器组件中使用，用于阻止已登录用户访问登录/注册页
  * @param redirectTo 重定向地址，默认为 /home
  */
-export async function requireGuest(redirectTo: string = "/home") {
+export async function requireGuest(redirectTo = "/home") {
   const user = await getCurrentUser();
   
   if (user) {

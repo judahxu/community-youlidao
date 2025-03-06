@@ -34,7 +34,15 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-const DashboardLayout = ({ children, user = null }) => {
+// Add this type definition at the top of your file
+type User = {
+  name?: string;
+  email?: string;
+  image?: string;
+  role?: string;
+};
+
+const DashboardLayout = ({ children, user = null }:{ children: React.ReactNode; user?: User | null;}) => {
   const router = useRouter();
   const { data: session, status } = useSession();
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -68,13 +76,13 @@ const DashboardLayout = ({ children, user = null }) => {
 
   // 获取用户头像信息
   const getUserInitials = () => {
-    const currentUser = user || session?.user;
+    const currentUser = user ?? session?.user;
     if (!currentUser?.name) return "AI";
     
     // 提取用户名的前两个字符作为头像备用显示
     const nameParts = currentUser.name.split(' ');
     if (nameParts.length > 1) {
-      return `${nameParts[0][0]}${nameParts[1][0]}`.toUpperCase();
+      return `${nameParts[0]![0]}${nameParts[1]![0]}`.toUpperCase();
     }
     return currentUser.name.substring(0, 2).toUpperCase();
   };
@@ -172,12 +180,18 @@ const DashboardLayout = ({ children, user = null }) => {
                         <span>个人中心</span>
                       </Link>
                     </DropdownMenuItem>
-                    <DropdownMenuItem asChild>
+                    {session?.user.role === 'admin' && <DropdownMenuItem asChild>
+                      <Link href="/admin" className="cursor-pointer flex items-center">
+                        <Settings className="mr-2 h-4 w-4" />
+                        <span>管理后台</span>
+                      </Link>
+                    </DropdownMenuItem>}
+                    {/* <DropdownMenuItem asChild>
                       <Link href="/settings" className="cursor-pointer flex items-center">
                         <Settings className="mr-2 h-4 w-4" />
                         <span>设置</span>
                       </Link>
-                    </DropdownMenuItem>
+                    </DropdownMenuItem> */}
                     <DropdownMenuSeparator />
                     <DropdownMenuItem 
                       className="cursor-pointer text-red-500 focus:text-red-500" 
@@ -247,7 +261,7 @@ const DashboardLayout = ({ children, user = null }) => {
 };
 
 // 侧边栏组件
-const Sidebar = ({ isAuthenticated }) => {
+const Sidebar = ({ isAuthenticated }: { isAuthenticated: boolean }) => {
   return (
     <nav className="h-full py-6 px-2 overflow-y-auto">
       <div className="space-y-1">
@@ -296,7 +310,7 @@ const Sidebar = ({ isAuthenticated }) => {
 };
 
 // 侧边栏部分组件
-const SidebarSection = ({ title, items, isAuthenticated }) => {
+const SidebarSection = ({ title, items, isAuthenticated }: { title: string, items: { name: string, badge: string | null, path: string, requiresAuth: boolean }[], isAuthenticated: boolean }) => {
   const [isOpen, setIsOpen] = useState(true);
   
   // 过滤出可见项目

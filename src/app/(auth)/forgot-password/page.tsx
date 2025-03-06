@@ -155,7 +155,7 @@ const ForgotPasswordPage = () => {
 
   
 // 步骤组件
-const StepIndicator = ({ currentStep }) => {
+const StepIndicator = ({ currentStep }: { currentStep: number }) => {
   return (
     <div className="flex justify-between items-center w-full mb-6">
       {[1, 2, 3].map((step) => (

@@ -6,6 +6,7 @@ import { initRedis } from '@/server/redis'
 
 import { TRPCReactProvider } from "~/trpc/react";
 import { SessionProvider } from 'next-auth/react';
+import { Toaster } from "@/components/ui/sonner"
 
 export const metadata: Metadata = {
   title: "AI尤里岛 - 专业AI新闻社区平台",
@@ -14,9 +15,9 @@ export const metadata: Metadata = {
   authors: [{ name: "AI尤里岛团队" }],
   creator: "AI尤里岛",
   publisher: "AI尤里岛",
-  robots: "index, follow",
-  themeColor: "#2563EB", // 使用品牌规范中的主色
-  viewport: "width=device-width, initial-scale=1",
+  // robots: "index, follow",
+  // themeColor: "#2563EB", // 使用品牌规范中的主色
+  // viewport: "width=device-width, initial-scale=1",
 };
 
 // 初始化Redis连接
@@ -34,6 +35,7 @@ export default function RootLayout({
       <html lang="en" className={`${GeistSans.variable}`}>
         <body>
           <TRPCReactProvider>{children}</TRPCReactProvider>
+          <Toaster />
         </body>
       </html>
     </SessionProvider>

@@ -21,11 +21,13 @@ export const credentialsProvider = CredentialsProvider({
         throw new Error("缺少登录凭据");
       }
 
+      const email = typeof credentials.email === 'string' ? credentials.email.toLowerCase() : '';
+
       // 从数据库查询用户
       const user = await db
         .select()
         .from(users)
-        .where(eq(users.email, credentials.email.toLowerCase()))
+        .where(eq(users.email, email))
         .limit(1);
 
       if (user.length === 0) {
@@ -37,16 +39,17 @@ export const credentialsProvider = CredentialsProvider({
       const userPassword = await db
         .select()
         .from(userPasswords)
-        .where(eq(userPasswords.userId, user[0].id))
+        .where(eq(userPasswords.userId, user[0]!.id))
         .limit(1);
 
       if (!userPassword.length) {
         throw new Error("未找到用户密码");
       }
 
+      
       const isPasswordValid = await compare(
-        credentials.password,
-        userPassword[0].hash
+        credentials.password as string,
+        userPassword[0]!.hash
       );
 
       if (!isPasswordValid) {
@@ -55,10 +58,12 @@ export const credentialsProvider = CredentialsProvider({
 
       // 返回用户信息（不包含敏感数据）
       return {
-        id: user[0].id,
-        name: user[0].name,
-        email: user[0].email,
-        image: user[0].image,
+        id: user[0]!.id,
+        name: user[0]!.name,
+        email: user[0]!.email,
+        image: user[0]!.image,
+        role: user[0]!.role,
+        status: user[0]!.status
       };
     } catch (error) {
       console.error("认证错误:", error);

@@ -16,7 +16,7 @@ export default async function ProfilePage() {
     if (!user.name) return "U";
     
     const nameParts = user.name.split(" ");
-    if (nameParts.length > 1) {
+    if (nameParts.length > 1 && nameParts[0] && nameParts[1]) {
       return `${nameParts[0][0]}${nameParts[1][0]}`.toUpperCase();
     }
     return user.name.substring(0, 2).toUpperCase();

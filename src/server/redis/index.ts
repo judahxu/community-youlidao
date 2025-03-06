@@ -2,7 +2,7 @@
 import { createClient } from 'redis';
 
 // 从环境变量获取Redis配置
-const redisUrl = process.env.REDIS_URL || 'redis://localhost:6379';
+const redisUrl = process.env.REDIS_URL ?? 'redis://localhost:6379';
 
 // 创建Redis客户端
 const redisClient = createClient({

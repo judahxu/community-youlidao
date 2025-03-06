@@ -16,11 +16,12 @@ const registerSchema = z.object({
     .min(8, { message: '密码至少需要8个字符' })
     .max(100, { message: '密码长度不能超过100个字符' }),
 });
+type RegisterRequestBody = z.infer<typeof registerSchema>;
 
 export async function POST(request: NextRequest) {
   try {
     // 解析请求体
-    const body = await request.json();
+    const body = await request.json() as RegisterRequestBody;
     
     // 验证请求数据
     const result = registerSchema.safeParse(body);

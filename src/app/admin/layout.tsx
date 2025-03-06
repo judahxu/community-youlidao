@@ -29,8 +29,9 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { useRouter, usePathname } from 'next/navigation';
 
-const AdminLayout = ({ children }) => {
+const AdminLayout = ({ children }: Readonly<{ children: React.ReactNode }>) => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [scrolled, setScrolled] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
@@ -157,65 +158,85 @@ const AdminLayout = ({ children }) => {
 
 // 管理后台侧边栏组件
 const AdminSidebar = ({ collapsed = false }) => {
+  const router = useRouter();
+  const pathname = usePathname(); // Get current path
+
   const navItems = [
     { 
       icon: <BarChart2 className="h-5 w-5" />, 
       label: '控制台', 
+      href: '/admin',
       active: true, 
       notification: null 
     },
     { 
       icon: <Users className="h-5 w-5" />, 
       label: '用户管理', 
+      href: '/admin/users',
       active: false, 
       notification: '12' 
     },
     { 
       icon: <BookOpen className="h-5 w-5" />, 
-      label: '内容管理', 
+      label: '内容管理',
+      href: '/admin/content', 
       active: false, 
       notification: null,
       children: [
-        { label: '课程管理', active: false },
-        { label: '教程管理', active: false },
-        { label: '学习路径', active: false },
+        { label: '课程管理', href: '/admin/content/courses', active: false },
+        { label: '教程管理', href: '/admin/content/tutorials', active: false },
+        { label: '学习路径', href: '/admin/content/paths', active: false },
       ]
     },
     { 
       icon: <Wrench className="h-5 w-5" />, 
-      label: '工具管理', 
+      label: '工具管理',
+      href: '/admin/tools',
       active: false, 
       notification: null 
     },
     { 
       icon: <MessageSquare className="h-5 w-5" />, 
-      label: '社区管理', 
+      label: '社区管理',
+      href: '/admin/community',
       active: false, 
       notification: '5',
       children: [
-        { label: '文章审核', active: false },
-        { label: '评论管理', active: false },
-        { label: '用户反馈', active: false },
+        { label: '文章审核', href: '/admin/community/posts', active: false },
+        { label: '评论管理', href: '/admin/community/comments', active: false },
+        { label: '用户反馈', href: '/admin/community/feedback', active: false },
       ]
     },
     { 
       icon: <FileText className="h-5 w-5" />, 
-      label: '订单管理', 
+      label: '订单管理',
+      href: '/admin/orders',
       active: false, 
       notification: null 
     },
     { 
       icon: <Settings className="h-5 w-5" />, 
-      label: '系统设置', 
+      label: '系统设置',
+      href: '/admin/settings',
       active: false, 
       notification: null,
       children: [
-        { label: '基础设置', active: false },
-        { label: '权限设置', active: false },
-        { label: '日志记录', active: false },
+        { label: '基础设置', href: '/admin/settings/basic', active: false },
+        { label: '权限设置', href: '/admin/settings/permissions', active: false },
+        { label: '日志记录', href: '/admin/settings/logs', active: false },
       ]
     },
   ];
+
+  const isActive = (href: string) => {
+    if (href === '/admin' && pathname === '/admin') {
+      return true;
+    }
+    return pathname.startsWith(href) && href !== '/admin';
+  };
+
+  // Determine if a sub-item is active
+  const isSubItemActive = (href: string) => pathname === href;
 
   return (
     <nav className="h-full py-6 overflow-y-auto">
@@ -224,11 +245,16 @@ const AdminSidebar = ({ collapsed = false }) => {
           <SidebarItem 
             key={index} 
             icon={item.icon} 
-            label={item.label} 
-            active={item.active} 
+            label={item.label}
+            href={item.href} 
+            active={isActive(item.href)} 
             notification={item.notification}
             collapsed={collapsed}
-            subItems={item.children}
+            subItems={item.children?.map(subItem => ({
+              ...subItem,
+              active: isSubItemActive(subItem.href)
+            }))}
+            onNavigate={(path) => router.push(path)}
           />
         ))}
       </div>
@@ -239,6 +265,7 @@ const AdminSidebar = ({ collapsed = false }) => {
           className={`w-full text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 ${
             collapsed ? 'justify-center px-0' : ''
           }`}
+          onClick={() => router.push('/')}
         >
           <LogOut className="h-5 w-5 mr-2" />
           {!collapsed && <span>退出系统</span>}
@@ -249,9 +276,36 @@ const AdminSidebar = ({ collapsed = false }) => {
 };
 
 // 侧边栏项目组件
-const SidebarItem = ({ icon, label, active, notification, collapsed, subItems }) => {
-  const [expanded, setExpanded] = useState(false);
+const SidebarItem = ({ 
+  icon, 
+  label, 
+  href, 
+  active, 
+  notification, 
+  collapsed, 
+  subItems, 
+  onNavigate 
+}: { 
+  icon: React.ReactNode, 
+  label: string, 
+  href: string, 
+  active: boolean, 
+  notification: string | null, 
+  collapsed: boolean, 
+  subItems?: { label: string, href: string, active: boolean }[],
+  onNavigate: (path: string) => void 
+}) => {  
   
+  const [expanded, setExpanded] = useState(false);
+  const handleClick = () => {
+    if (subItems && !collapsed) {
+      // If item has children and not collapsed, toggle expansion
+      setExpanded(!expanded);
+    } else if (href) {
+      // Otherwise navigate to the href
+      onNavigate(href);
+    }
+  };
   return (
     <div>
       <button 
@@ -262,7 +316,7 @@ const SidebarItem = ({ icon, label, active, notification, collapsed, subItems })
         } ${
           collapsed ? 'justify-center p-3' : 'px-3 py-3'
         }`}
-        onClick={() => subItems && !collapsed && setExpanded(!expanded)}
+        onClick={handleClick}
       >
         <div className={`${collapsed ? '' : 'mr-3'} ${active ? 'text-[#2A5674] dark:text-[#4A8CAB]' : ''}`}>
           {icon}
@@ -301,6 +355,7 @@ const SidebarItem = ({ icon, label, active, notification, collapsed, subItems })
                   ? 'bg-[#E5F0F6] text-[#2A5674] dark:bg-[#2A5674]/20 dark:text-[#4A8CAB] font-medium' 
                   : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800'
               }`}
+              onClick={() => onNavigate(subItem.href)}
             >
               {subItem.label}
             </button>

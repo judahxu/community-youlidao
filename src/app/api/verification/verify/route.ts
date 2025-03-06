@@ -13,11 +13,15 @@ const verifyCodeSchema = z.object({
   }),
 });
 
+type VerifyCodeRequestBody = z.infer<typeof verifyCodeSchema>;
+
+
+
 // 验证验证码API
 export async function POST(request: NextRequest) {
   try {
     // 解析请求体
-    const body = await request.json();
+    const body = await request.json() as VerifyCodeRequestBody;
     
     // 验证请求数据
     const result = verifyCodeSchema.safeParse(body);

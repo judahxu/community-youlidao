@@ -102,7 +102,7 @@ const RegisterPage = () => {
   };
 
   // 注册提交逻辑
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError('');
     setSuccess('');
@@ -154,7 +154,9 @@ const RegisterPage = () => {
         }),
       });
       
-      const data = await response.json();
+      const data = await response.json() as {
+        message: string;
+      };
       
       if (!response.ok) {
         throw new Error(data.message || '注册失败');
@@ -167,7 +169,7 @@ const RegisterPage = () => {
         router.push('/login');
       }, 1500);
     } catch (err) {
-      setError(err.message || '注册失败，请检查信息后重试');
+      setError((err as Error).message || '注册失败，请检查信息后重试');
     } finally {
       setIsLoading(false);
     }

@@ -11,12 +11,13 @@ const sendVerificationSchema = z.object({
     invalid_type_error: '验证类型必须是 registration 或 password-reset',
   }),
 });
+type SendVerificationRequestBody = z.infer<typeof sendVerificationSchema>;
 
 // 发送验证码API
 export async function POST(request: NextRequest) {
   try {
     // 解析请求体
-    const body = await request.json();
+    const body = await request.json() as SendVerificationRequestBody;
     
     // 验证请求数据
     const result = sendVerificationSchema.safeParse(body);

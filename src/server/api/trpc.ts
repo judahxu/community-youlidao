@@ -131,3 +131,25 @@ export const protectedProcedure = t.procedure
       },
     });
   });
+
+
+  /**
+ * 管理员专用路由
+ * 
+ * 只有具有管理员权限的用户才能访问这些路由
+ */
+export const adminProcedure = protectedProcedure.use(({ ctx, next }) => {
+
+  console.log('adminProcedure',ctx.session.user);
+  // 检查用户是否为管理员
+  if (ctx.session.user.role !== "admin") {
+    throw new TRPCError({ 
+      code: "FORBIDDEN", 
+      message: "您没有权限执行此操作，需要管理员权限" 
+    });
+  }
+  
+  return next({
+    ctx,
+  });
+});

@@ -1,5 +1,5 @@
 'use client';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect,Suspense  } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -12,7 +12,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Mail, Lock, AlertTriangle, ArrowRight, CheckCircle } from 'lucide-react';
 import { signIn } from 'next-auth/react';
 
-const LoginPage = () => {
+const LoginContent = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [email, setEmail] = useState('');
@@ -47,7 +47,7 @@ const LoginPage = () => {
     }
   }, [searchParams]);
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     setSuccess('');
@@ -76,7 +76,7 @@ const LoginPage = () => {
       setSuccess('登录成功，正在跳转...');
       
       // 如果有回调URL则跳转到回调URL，否则跳转到首页
-      router.push(result?.url || '/home');
+      router.push(result?.url ?? '/home');
     } catch (err) {
       setError('邮箱或密码错误，请重试');
     } finally {
@@ -85,7 +85,6 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-950 p-4">
       <div className="w-full max-w-md space-y-8">
         {/* Logo和标题 */}
         <div className="text-center space-y-2">
@@ -204,6 +203,15 @@ const LoginPage = () => {
           <a href="#" className="text-[#2A5674] dark:text-[#4A8CAB] hover:text-[#3B7A9E] transition-colors"> 隐私政策</a>
         </p>
       </div>
+  );
+};
+// Main component with Suspense
+const LoginPage = () => {
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-950 p-4">
+      <Suspense fallback={<div>Loading...</div>}>
+        <LoginContent />
+      </Suspense>
     </div>
   );
 };

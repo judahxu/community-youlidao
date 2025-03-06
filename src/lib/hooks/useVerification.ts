@@ -40,7 +40,10 @@ export function useVerification(): UseVerificationReturn {
         body: JSON.stringify(options),
       });
       
-      const data = await response.json();
+      const data = await response.json() as {
+        success: boolean;
+        message: string;
+      };
       
       if (!response.ok) {
         throw new Error(data.message || '发送验证码失败');
@@ -78,7 +81,10 @@ export function useVerification(): UseVerificationReturn {
         body: JSON.stringify(options),
       });
       
-      const data = await response.json();
+      const data = await response.json() as {
+        success: boolean;
+        message: string;
+      };
       
       if (!response.ok) {
         throw new Error(data.message || '验证码验证失败');

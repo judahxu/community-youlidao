@@ -99,7 +99,7 @@ export class VerificationService {
       
       // 发送邮件
       const info = await transporter.sendMail({
-        from: `"AI尤里岛" <${process.env.EMAIL_FROM || process.env.EMAIL_USER}>`,
+        from: `"AI尤里岛" <${process.env.EMAIL_FROM ?? process.env.EMAIL_USER}>`,
         to: email,
         subject,
         html,
@@ -141,7 +141,9 @@ export class VerificationService {
       const code = this.generateCode();
       
       // 存储验证码到Redis
-      await redis.set(existingKey, code, 'EX', expiresIn);
+      await redis.set(existingKey, code, {
+        EX: expiresIn,
+      });
       
       // 发送验证码邮件
       const emailSent = await this.sendEmail(email, code, type);
